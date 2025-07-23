@@ -1,9 +1,2 @@
-import { isObject } from "@vue/shared";
-
-console.log(isObject({}));
-
-function fn(a, b) {
-  return a + b;
-}
-
-export { fn };
+export * from './ref';
+export * from './effect';
