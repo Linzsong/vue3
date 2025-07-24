@@ -15,14 +15,18 @@
       const count = ref(0);
 
       effect(() => {
-        console.log('count.value ==>', count.value);
+        console.log('effect1 count.value  ==>', count.value);
+      });
+      
+      effect(() => {
+        console.log('effect2 count.value ==>', count.value);
       });
 
       setTimeout(() => {
         count.value = 1
       }, 1000);
 
-      
+
     </script>
   </body>
 </html>

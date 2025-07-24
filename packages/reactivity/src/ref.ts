@@ -1,19 +1,8 @@
 import { activeSub } from './effect';
+import { propagate, link,  type Link } from './system';
 
 enum ReactiveFlags {
   IS_REF = '__v_isRef',
-}
-
-/**
- * 链表节点
- */
-interface Link {
-  // 保存 effect
-  sub: Function;
-  // 下一个节点
-  nextSub: Link | undefined;
-  // 上一个节点
-  prevSub: Link | undefined;
 }
 
 /**
@@ -42,40 +31,14 @@ class RefImpl {
   get value() {
     if (activeSub) {
       // 如果 activeSub 存在，则保存起来，等到更新时重新出发
-      this.subs = activeSub;
-      const newLink: Link = {
-        sub: activeSub,
-        nextSub: undefined,
-        prevSub: undefined,
-      };
-
-      /**
-       * 关联链表关系，分2种情况
-       * 1. 有尾节点，就往尾节点后面添加
-       * 2. 如果没有尾节点，则表示第一次关联，头尾节点相同
-       */
-      if (this.subsTail) {
-        this.subsTail.nextSub = newLink;
-        newLink.prevSub = this.subsTail;
-        // this.subsTail = newLink
-      } else {
-        this.subs = newLink
-      }
-      this.subsTail = newLink
+      trackRef(this);
     }
     return this._value;
   }
 
   set value(newValue) {
     this._value = newValue;
-
-    // 通知 effect 重新执行, 获取到最新的值
-    let currentSub = this.subs
-    currentSub.sub();
-    while (currentSub.nextSub) {
-      currentSub = currentSub.nextSub
-      currentSub.sub();
-    }
+    triggerRef(this);
   }
 }
 
@@ -86,4 +49,22 @@ export function ref(value) {
 // 判断是否为 ref
 export function isRef(value) {
   return !!(value && value[ReactiveFlags.IS_REF]);
+}
+
+/**
+ * 收集依赖，建立 ref 和 effect 之间的链表关系
+ * @param dep
+ */
+export function trackRef(dep) {
+  if (activeSub) {
+    link(dep, activeSub);
+  }
+}
+
+/**
+ * 触发 ref 关联的 effect 重新执行
+ * @param dep
+ */
+export function triggerRef(dep) {
+  if(dep.subs) propagate(dep.subs);
 }
