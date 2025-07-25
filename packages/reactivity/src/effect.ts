@@ -42,7 +42,8 @@ export function effect(fn: any, options) {
   /**
    * 绑定函数的 this
    */
-  const runner = () => e.run.call(e);
+  const runner = e.run.bind(e)
+
   /**
    * 把 effect 的实例放到函数属性中 和 bind 类似
    */
