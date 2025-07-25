@@ -8,25 +8,30 @@
   <body>
     <script type="module">
       import { ref, effect } from '../dist/reactivity.esm.js';
-      // import { ref, effect } from '../../../node_modules/vue/dist/vue.esm-browser.prod.js'
+      // import {
+      //   ref,
+      //   effect,
+      // } from '../../../node_modules/vue/dist/vue.esm-browser.prod.js';
 
-      //   console.log(ref, effect);
 
       const count = ref(0);
 
-      effect(() => {
-        console.log('effect1 count.value  ==>', count.value);
-      });
-      
-      effect(() => {
-        console.log('effect2 count.value ==>', count.value);
-      });
+      const runner = effect(
+        () => {
+          console.log('effect1 count.value  ==>', count.value);
+          return '1';
+        },
+        {
+          scheduler() {
+            console.log('调度器', runner());
+          },
+        },
+      );
+      console.dir(runner);
 
       setTimeout(() => {
-        count.value = 1
+        count.value = 1;
       }, 1000);
-
-
     </script>
   </body>
 </html>

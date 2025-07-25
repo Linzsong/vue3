@@ -42,10 +42,6 @@ class RefImpl {
   }
 }
 
-export function ref(value) {
-  return new RefImpl(value);
-}
-
 // 判断是否为 ref
 export function isRef(value) {
   return !!(value && value[ReactiveFlags.IS_REF]);
@@ -67,4 +63,8 @@ export function trackRef(dep) {
  */
 export function triggerRef(dep) {
   if(dep.subs) propagate(dep.subs);
+}
+
+export function ref(value) {
+  return new RefImpl(value);
 }
